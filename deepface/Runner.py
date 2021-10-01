@@ -18,10 +18,10 @@ lock = threading.Lock()
 app = Flask(__name__)
 model_name = 'VGG-Face'
 db_path = r"./images"
-detector_backend = 'opencv'
+detector_backend = 'mediapipe'
 distance_metric = 'cosine'
 input_shape = (224, 224)
-
+#print(distance_metric)
 
 def embed(model_name, db_path, detector_backend, input_shape, distance_metric):
 
