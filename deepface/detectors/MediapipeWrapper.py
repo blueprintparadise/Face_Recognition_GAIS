@@ -8,7 +8,7 @@ def build_model():
     mp_face_detection = mp.solutions.face_detection
     # Build a face detector
     # min_detection_confidence - "A filter to analyse the training photographs"
-    face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.75)
+    face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.45)
     return face_detection
 
 

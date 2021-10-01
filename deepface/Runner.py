@@ -75,7 +75,7 @@ def index():
 @app.route('/video')
 def video():
     return Response(realtime.analysis(db_path,
-                                      enable_face_analysis=False, detector_backend=detector_backend, df=df,model_name=model_name),
+                                      enable_face_analysis=False, detector_backend=detector_backend, df=df,model_name=model_name, time_threshold=3, frame_threshold=3),
                     mimetype="multipart/x-mixed-replace; boundary=frame")
 
 

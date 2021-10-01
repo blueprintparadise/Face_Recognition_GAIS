@@ -35,7 +35,7 @@ dir_list = os.listdir(root_dir + "\\images" )
 print(dir_list)
 def remove_augmentation():
     for man in dir_list:
-        image_dir = root_dir + "\\images" + "\\" + str(man)
+        image_dir = root_dir  + "\\images\\" + str(man)
         images = os.listdir(image_dir)
         filtered_files = [file for file in images if file.startswith("form_aug")]
         for file in filtered_files:
