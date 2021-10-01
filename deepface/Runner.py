@@ -84,6 +84,7 @@ if __name__ == '__main__':
     df = embed(model_name, db_path, detector_backend, input_shape, distance_metric)
     t = threading.Thread()
     t.daemon = True
+    print("System Running Succesfully")
     t.start()
     # start the flask app
     app.run(host='0.0.0.0', port='8001', debug=True,
