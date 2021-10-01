@@ -16,10 +16,10 @@ import realtime
 
 lock = threading.Lock()
 app = Flask(__name__)
-model_name = 'VGG-Face'
+model_name = 'Facenet'
 db_path = r"./images"
 detector_backend = 'mediapipe'
-distance_metric = 'cosine'
+distance_metric = 'euclidean'
 input_shape = (224, 224)
 #print(distance_metric)
 
@@ -75,7 +75,7 @@ def index():
 @app.route('/video')
 def video():
     return Response(realtime.analysis(db_path,
-                                      enable_face_analysis=False, detector_backend=detector_backend, df=df),
+                                      enable_face_analysis=False, detector_backend=detector_backend, df=df,model_name=model_name),
                     mimetype="multipart/x-mixed-replace; boundary=frame")
 
 

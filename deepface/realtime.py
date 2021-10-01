@@ -27,9 +27,9 @@ def analysis(db_path,df, model_name='VGG-Face', detector_backend='opencv', dista
 
     # ------------------------
 
-    input_shape = (224, 224);
-    input_shape_x = input_shape[0];
-    input_shape_y = input_shape[1]
+    #input_shape = (224, 224);
+    #input_shape_x = input_shape[0];
+    #input_shape_y = input_shape[1]
 
     text_color = (255, 255, 255)
 
