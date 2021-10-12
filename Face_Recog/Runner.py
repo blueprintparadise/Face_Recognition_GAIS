@@ -17,7 +17,7 @@ from OpenSSL import SSL
 '''PLEASE NOTE ---------------------------------------------
     The min_detection_confidence in Mediapipe
     And 
-    The  if w > 0 (line 73- realtime) - Need to be modified according to the hardware used.
+    The  if w > 0 (line 73- realtime) - Need to be modified according to the hardware/Webcam used.
 '''
 outputFrame = None
 
