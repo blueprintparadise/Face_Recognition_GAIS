@@ -20,3 +20,7 @@ argparse
 flask
 mediapipe
 pyopenssl
+cmake
+dlib
+dotmap
+imutils

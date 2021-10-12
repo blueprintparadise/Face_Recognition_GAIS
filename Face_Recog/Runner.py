@@ -9,8 +9,10 @@ from flask import render_template
 import threading
 # Fancy Progress Bars
 from tqdm import tqdm
+
 import os
 import pandas as pd
+# For certificate - converting "http" request to "https"
 from OpenSSL import SSL
 '''PLEASE NOTE ---------------------------------------------
     The min_detection_confidence in Mediapipe
