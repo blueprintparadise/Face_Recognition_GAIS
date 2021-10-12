@@ -16,3 +16,7 @@ seaborn
 matplotlib
 albumentations
 pyOpenSSL
+argparse
+flask
+mediapipe
+pyopenssl
