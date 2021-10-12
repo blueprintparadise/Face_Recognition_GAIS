@@ -27,7 +27,7 @@ if tf_version == 2:
 
 #------------------------------
 
-from deepface import DeepFace
+from Face_Recog import Main_Model
 
 #------------------------------
 
@@ -101,7 +101,7 @@ def analyzeWrapper(req, trx_id = 0):
 	#---------------------------
 
 	try:
-		resp_obj = DeepFace.analyze(instances, actions = actions)
+		resp_obj = Main_Model.analyze(instances, actions = actions)
 	except Exception as err:
 		print("Exception: ", str(err))
 		return jsonify({'success': False, 'error': str(err)}), 205
@@ -182,11 +182,11 @@ def verifyWrapper(req, trx_id = 0):
 	#--------------------------
 
 	try:
-		resp_obj = DeepFace.verify(instances
-			, model_name = model_name
-			, distance_metric = distance_metric
-			, detector_backend = detector_backend
-		)
+		resp_obj = Main_Model.verify(instances
+                                     , model_name = model_name
+                                     , distance_metric = distance_metric
+                                     , detector_backend = detector_backend
+                                     )
 
 		if model_name == "Ensemble": #issue 198.
 			for key in resp_obj: #issue 198.
@@ -259,10 +259,10 @@ def representWrapper(req, trx_id = 0):
 
 	try:
 
-		embedding = DeepFace.represent(img
-			, model_name = model_name
-			, detector_backend = detector_backend
-		)
+		embedding = Main_Model.represent(img
+                                         , model_name = model_name
+                                         , detector_backend = detector_backend
+                                         )
 
 	except Exception as err:
 		print("Exception: ",str(err))
