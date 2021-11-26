@@ -7,7 +7,7 @@ def build_model():
     import mediapipe as mp
     mp_face_detection = mp.solutions.face_detection
     # min_detection_confidence - "A filter to analyse the training photographs"
-    face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.60)
+    face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.50)
     # Returns detected face
     return face_detection
 

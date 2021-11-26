@@ -9,11 +9,13 @@ from flask import render_template
 import threading
 # Fancy Progress Bars
 from tqdm import tqdm
-
+global offset
+offset = False
 import os
 import pandas as pd
+
 # For certificate - converting "http" request to "https"
-from OpenSSL import SSL
+#from OpenSSL import SSL
 '''PLEASE NOTE ---------------------------------------------
     The min_detection_confidence in Mediapipe
     And 
@@ -30,7 +32,7 @@ app = Flask(__name__)
 model_name = 'Facenet'
 
 db_path = r"./images"
-detector_backend = 'mediapipe'
+detector_backend = 'opencv'
 ''' Options-'opencv',
          'ssd' ,
          'dlib',
@@ -44,6 +46,7 @@ input_shape = (224, 224)
 
 
 # Embedding Images to dataframe
+@app.route('/embed', methods=["GET"])
 def embed(model_name, db_path, detector_backend, distance_metric):
     employees = []
     # check passed db folder exists
@@ -84,8 +87,13 @@ def embed(model_name, db_path, detector_backend, distance_metric):
     df['distance_metric'] = distance_metric
     # returns dataframe with employee, embedding and distance_metric information
     return df
-
-
+@app.route('/retrn', methods=["GET"])
+def retrn():
+    emb = embed(model_name, db_path, detector_backend, distance_metric)
+    lst = ''
+    for i in emb['embedding']:
+        lst = str(lst) + str(i)
+    return lst
 @app.route("/")
 def index():
     # return the rendered template
@@ -95,8 +103,8 @@ def index():
 @app.route('/video')
 def video():
     return Response(
-        realtime.analysis(db_path, detector_backend=detector_backend, df=df, model_name=model_name, time_threshold=3,
-                          frame_threshold=3),
+        realtime.analysis(db_path, detector_backend=detector_backend, df=df, model_name=model_name, time_threshold=1,
+                          frame_threshold=1),
         mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
@@ -110,5 +118,5 @@ if __name__ == '__main__':
     # start the flask app
     app.jinja_env.cache = {}
     app.run(host='0.0.0.0', port='8001', debug=True,
-            use_reloader=False, ssl_context='adhoc')
+            use_reloader=False)
 

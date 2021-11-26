@@ -1,25 +1,30 @@
 import os
 from tqdm import tqdm
 import numpy as np
-import pandas as pd
+import math
 import cv2
 import time
 import re
 import os
-
+import mediapipe
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 from Face_Recog import Main_Model
 from Face_Recog.commons import functions, distance as dst
 from Face_Recog.detectors import FaceDetector
-
+from scipy.spatial import distance as dist
+from tensorflow.keras.models import model_from_json
 Threshold_setter = 0.5
-
+global offset
+offset = False
+import Liveness_Blinking
+Blink_time = 30
 
 def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', distance_metric='cosine',
              source=0, time_threshold=5, frame_threshold=5):
+    blinklist = []
     face_detector = FaceDetector.build_model(detector_backend)
     print("Detector backend is ", detector_backend)
-
+    tic = time.time()
     # ------------------------
 
     employees = []
@@ -51,12 +56,15 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
     face_detected = False
     face_included_frames = 0  # freeze screen if face detected sequantially 5 frames
     freezed_frame = 0
-    tic = time.time()
+  #-----------------------------------------------------------------------------------------------------------------------------------------------
+
 
     cap = cv2.VideoCapture(source, cv2.CAP_DSHOW)  # webcam
     while (True):
         ret, img = cap.read()
         ret2, img2 = cap.read()
+        Blink = Liveness_Blinking.Liveness(ret = ret, frame = img)
+        #print(Blink)
         if img is None:
             break
         raw_img = img.copy()
@@ -81,98 +89,117 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
             freeze = True
             base_img = raw_img.copy()
             detected_faces_final = detected_faces.copy()
-            tic = time.time()
 
-        if freeze == True:
-            toc = time.time()
-            if (toc - tic) < time_threshold:
-                if freezed_frame == 0:
-                    freeze_img = base_img.copy()
-                    Fin_img = base_img.copy()
-                    # freeze_img = np.zeros(resolution, np.uint8) #here, np.uint8 handles showing white area issue
-                    for detected_face in detected_faces_final:
-                        x = detected_face[0];
-                        y = detected_face[1]
-                        w = detected_face[2];
-                        h = detected_face[3]
-                        cv2.rectangle(Fin_img, (x, y), (x + w, y + h), (67, 67, 67),
-                                      1)  # draw rectangle to main image
 
-                        # apply deep learning for custom_face
 
-                        custom_face = base_img[y:y + h, x:x + w]
+            if freezed_frame == 0:
 
-                        # face recognition
+                freeze_img = base_img.copy()
+                Fin_img = base_img.copy()
+                # freeze_img = np.zeros(resolution, np.uint8) #here, np.uint8 handles showing white area issue
+                for detected_face in detected_faces_final:
+                    x = detected_face[0];
+                    y = detected_face[1]
+                    w = detected_face[2];
+                    h = detected_face[3]
+                    cv2.rectangle(Fin_img, (x, y), (x + w, y + h), (67, 67, 67),
+                                  1)  # draw rectangle to main image
 
-                        custom_face = functions.preprocess_face(img=custom_face,
-                                                                target_size=(input_shape_y, input_shape_x),
-                                                                enforce_detection=False, detector_backend='opencv')
+                    # apply deep learning for custom_face
+                    live_img = base_img.copy()
+                    #roi_face = live_img[y:y + h, x:x + w]
+                    #roi_face_clr = live_img[y:y + h, x:x + w]
+                    #eyes = eye_cascade.detectMultiScale(roi_face)
+                    #print(eyes)
+                    custom_face = base_img[y:y + h, x:x + w]
 
-                        # check preprocess_face function handled
-                        if custom_face.shape[1:3] == input_shape:
-                            if df.shape[0] > 0:  # if there are images to verify, apply face recognition
-                                img1_representation = model.predict(custom_face)[0, :]
+                    #liveornot = Liveness_Detection(live_img, x, y, h, w)
+                    # face recognition
 
-                                def findDistance(row):
-                                    distance_metric = row['distance_metric']
-                                    img2_representation = row['embedding']
+                    custom_face = functions.preprocess_face(img=custom_face,
+                                                            target_size=(input_shape_y, input_shape_x),
+                                                            enforce_detection=False, detector_backend='opencv')
 
-                                    distance = 1000  # initialize very large value
-                                    if distance_metric == 'cosine':
-                                        distance = dst.findCosineDistance(img1_representation, img2_representation)
-                                    elif distance_metric == 'euclidean':
-                                        distance = dst.findEuclideanDistance(img1_representation, img2_representation)
-                                    elif distance_metric == 'euclidean_l2':
-                                        distance = dst.findEuclideanDistance(dst.l2_normalize(img1_representation),
-                                                                             dst.l2_normalize(img2_representation))
+                    # check preprocess_face function handled
+                    if custom_face.shape[1:3] == input_shape:
+                        if df.shape[0] > 0:  # if there are images to verify, apply face recognition
+                            img1_representation = model.predict(custom_face)[0, :]
 
-                                    return distance
+                            def findDistance(row):
+                                distance_metric = row['distance_metric']
+                                img2_representation = row['embedding']
 
-                                df['distance'] = df.apply(findDistance, axis=1)
-                                df = df.sort_values(by=["distance"])
+                                distance = 1000  # initialize very large value
+                                if distance_metric == 'cosine':
+                                    distance = dst.findCosineDistance(img1_representation, img2_representation)
+                                elif distance_metric == 'euclidean':
+                                    distance = dst.findEuclideanDistance(img1_representation, img2_representation)
+                                elif distance_metric == 'euclidean_l2':
+                                    distance = dst.findEuclideanDistance(dst.l2_normalize(img1_representation),
+                                                                         dst.l2_normalize(img2_representation))
 
-                                candidate = df.iloc[0]
-                                employee_name = candidate['employee']
-                                best_distance = candidate['distance']
-                                values_ = candidate[['employee', 'distance']].values
-                                name = values_[0].split("\\")[-1].split("/")[0]
-                                print(name)
-                                if best_distance <= threshold - Threshold_setter:
+                                return distance
 
-                                    display_img = cv2.imread(employee_name)
+                            df['distance'] = df.apply(findDistance, axis=1)
+                            df = df.sort_values(by=["distance"])
 
-                                    display_img = cv2.resize(display_img, (pivot_img_size, pivot_img_size))
+                            candidate = df.iloc[0]
+                            employee_name = candidate['employee']
+                            best_distance = candidate['distance']
+                            values_ = candidate[['employee', 'distance']].values
+                            name = values_[0].split("\\")[-1].split("/")[0]
+                            print(values_)
+                            print("--------------------------------------------------------------")
+                            if best_distance <= threshold - Threshold_setter:
 
-                                    label = employee_name.split("/")[-1].replace(".jpg", "")
-                                    label = re.sub('[0-9]', '', label)
+                                display_img = cv2.imread(employee_name)
 
-                                    cv2.rectangle(Fin_img, (10, 10), (180, 50), (67, 67, 67), -10)
-                                    cv2.putText(Fin_img, str("Unknown"), (20, 40),
-                                                cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+                                display_img = cv2.resize(display_img, (pivot_img_size, pivot_img_size))
 
-                cv2.rectangle(Fin_img, (10, 10), (180, 50), (67, 67, 67), -10)
-                cv2.putText(Fin_img, str(name), (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
-                            1, (255, 255, 255), 1)
-                ret, buffer = cv2.imencode('.jpg', Fin_img)
-                frame = buffer.tobytes()
-                freezed_frame = freezed_frame + 1
-                yield (b'--frame\r\n'
-                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+                                label = employee_name.split("/")[-1].replace(".jpg", "")
+                                label = re.sub('[0-9]', '', label)
 
-                freezed_frame = freezed_frame + 1
+                                cv2.rectangle(Fin_img, (10, 10), (210, 50), (67, 67, 67), -10)
+                                cv2.putText(Fin_img, str("Unknown"), (20, 40),
+                                            cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
+            if int(timer) % Blink_time == 0 and sum(blinklist)<4:
+                print("_____________FAKE______________")
+                blinklist=[]
+            if Blink > 0:
+                Blink = "BLINKING"
             else:
-                face_detected = False
-                face_included_frames = 0
-                freeze = False
-                freezed_frame = 0
-        else:
-            ret, buffer = cv2.imencode('.jpg', img)
+                Blink = "NOT BLINKING"
+            cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
+            cv2.putText(Fin_img, str(name + "-[" + str(Blink) + "]"), (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
+                        1, (255, 255, 255), 1)
+            if Blink == "BLINKING":
+                Blink=1
+            else:
+                Blink=0
+            ret, buffer = cv2.imencode('.jpg', Fin_img)
             frame = buffer.tobytes()
-            # change_feed == True
+            freezed_frame = freezed_frame + 1
+            toc = time.time()
+            print(blinklist)
+            timer = toc-tic
+            print(int(timer))
+            blinklist.append(Blink)
+
+
+
+
+
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        if cv2.waitKey(1) & 0xFF == ord('q'):  # press q to quit
-            break
+
+            freezed_frame = freezed_frame + 1
+        else:
+            face_detected = False
+            face_included_frames = 0
+            freeze = False
+            freezed_frame = 0
+    if cv2.waitKey(1) & 0xFF == ord('q'):  # press q to quit
+            pass
     # kill open cv things
     cap.release()
     cv2.destroyAllWindows()
