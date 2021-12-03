@@ -13,11 +13,17 @@ from Face_Recog.commons import functions, distance as dst
 from Face_Recog.detectors import FaceDetector
 from scipy.spatial import distance as dist
 from tensorflow.keras.models import model_from_json
+
 Threshold_setter = 0.5
-global offset
-offset = False
 import Liveness_Blinking
 Blink_time = 30
+name_list = []
+def Listing(name):
+    name_list.append(name)
+    return None
+def api_notification():
+    name = name_list[-1]
+    return str(name)
 
 def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', distance_metric='cosine',
              source=0, time_threshold=5, frame_threshold=5):
@@ -118,7 +124,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
 
                     custom_face = functions.preprocess_face(img=custom_face,
                                                             target_size=(input_shape_y, input_shape_x),
-                                                            enforce_detection=False, detector_backend='opencv')
+                                                            enforce_detection=False, detector_backend='mediapipe')
 
                     # check preprocess_face function handled
                     if custom_face.shape[1:3] == input_shape:
@@ -162,7 +168,10 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
                                 cv2.rectangle(Fin_img, (10, 10), (210, 50), (67, 67, 67), -10)
                                 cv2.putText(Fin_img, str("Unknown"), (20, 40),
                                             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
-            if int(timer) % Blink_time == 0 and sum(blinklist)<4:
+            toc = time.time()
+            print(blinklist)
+            timer = toc - tic
+            if int(timer) % 30 == 0 and sum(blinklist)<4:
                 print("_____________FAKE______________")
                 blinklist=[]
             if Blink > 0:
@@ -172,6 +181,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
             cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
             cv2.putText(Fin_img, str(name + "-[" + str(Blink) + "]"), (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
                         1, (255, 255, 255), 1)
+            Listing(name)
             if Blink == "BLINKING":
                 Blink=1
             else:
@@ -179,13 +189,11 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
             ret, buffer = cv2.imencode('.jpg', Fin_img)
             frame = buffer.tobytes()
             freezed_frame = freezed_frame + 1
-            toc = time.time()
-            print(blinklist)
-            timer = toc-tic
+
             print(int(timer))
             blinklist.append(Blink)
 
-
+# split analysis into two parts and return necessary stuff from
 
 
 

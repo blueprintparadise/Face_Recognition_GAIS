@@ -8,14 +8,18 @@ from flask import Flask
 from flask import render_template
 import threading
 # Fancy Progress Bars
+import cv2
 from tqdm import tqdm
 global offset
 offset = False
 import os
 import pandas as pd
-
+import threading
+import requests
+outputFrame = None
+lock = threading.Lock()
 # For certificate - converting "http" request to "https"
-#from OpenSSL import SSL
+from OpenSSL import SSL
 '''PLEASE NOTE ---------------------------------------------
     The min_detection_confidence in Mediapipe
     And 
@@ -44,8 +48,50 @@ detector_backend = 'opencv'
 distance_metric = 'cosine'
 input_shape = (224, 224)
 
-
+@app.route("/Facevideo",methods=['GET','POST'])
+def Facevideo():
+    # cam = cv2.VideoCapture(0)
+    #
+    # try:
+    #
+    #     # creating a folder named data
+    #     if not os.path.exists('data'):
+    #         os.makedirs('data')
+    #
+    # # if not created then raise error
+    # except OSError:
+    #     print('Error: Creating directory of data')
+    #
+    # # frame
+    # currentframe = 0
+    #
+    # while (True):
+    #
+    #     # reading from frame
+    #     ret, frame = cam.read()
+    #
+    #     if ret:
+    #         # if video is still left continue creating images
+    #         name = './data/frame' + str(currentframe) + '.jpg'
+    #         print('Creating...' + name)
+    #
+    #         # writing the extracted images
+    #         cv2.imwrite(name, frame)
+    #
+    #         # increasing counter so that it will
+    #         # show how many frames are created
+    #         currentframe += 1
+    #     else:
+    #         break
+    response = requests.Response()
+    print(response)
+    return "Runing"
 # Embedding Images to dataframe
+
+@app.route('/name',methods=["GET"])
+def get_name():
+    name = realtime.api_notification()
+    return name
 @app.route('/embed', methods=["GET"])
 def embed(model_name, db_path, detector_backend, distance_metric):
     employees = []
@@ -117,6 +163,6 @@ if __name__ == '__main__':
     t.start()
     # start the flask app
     app.jinja_env.cache = {}
-    app.run(host='0.0.0.0', port='8001', debug=True,
-            use_reloader=False)
+    app.run(host='0.0.0.0', port='7788',threaded=True, debug=False,
+            use_reloader=False,ssl_context='adhoc')
 
