@@ -26,7 +26,7 @@ def api_notification():
     return str(name)
 
 def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', distance_metric='cosine',
-             source=0, time_threshold=5, frame_threshold=5):
+             source=0, time_threshold=5, frame_threshold=5,enable_multiple=True):
     blinklist = []
     face_detector = FaceDetector.build_model(detector_backend)
     print("Detector backend is ", detector_backend)
@@ -76,10 +76,19 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
         raw_img = img.copy()
         if freeze == False:
             # faces stores list of detected_face and region pair
-            faces = FaceDetector.detect_faces(face_detector, detector_backend, img, align=False)
+            faces = FaceDetector.detect_faces(face_detector, detector_backend, img, align=True)
+            print(len(faces))
             if len(faces) == 0:
                 face_included_frames = 0
         else:
+            num_faces = 1 if not enable_multiple else len(faces)
+            #num_actions = len(actions)
+            #num_checks = num_actions * num_faces
+            #disable_option = num_checks <= 1 or not prog_bar
+            #pbar = tqdm(range(0, num_checks), desc='Processing Faces', disable=disable_option)
+            print(num_faces)
+            face_response_obj = {}
+
             faces = []
         detected_faces = []
         face_index = 0
@@ -169,10 +178,10 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
                                 cv2.putText(Fin_img, str("Unknown"), (20, 40),
                                             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
             toc = time.time()
-            print(blinklist)
+            #print(blinklist)
             timer = toc - tic
             if int(timer) % 30 == 0 and sum(blinklist)<4:
-                print("_____________FAKE______________")
+                #print("_____________FAKE______________")
                 blinklist=[]
             if Blink > 0:
                 Blink = "BLINKING"
