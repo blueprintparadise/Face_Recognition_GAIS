@@ -65,7 +65,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
   #-----------------------------------------------------------------------------------------------------------------------------------------------
 
 
-    cap = cv2.VideoCapture(source, cv2.CAP_DSHOW)  # webcam
+    cap = cv2.VideoCapture(source)  # webcam
     while (True):
         ret, img = cap.read()
         ret2, img2 = cap.read()
@@ -86,7 +86,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
             #num_checks = num_actions * num_faces
             #disable_option = num_checks <= 1 or not prog_bar
             #pbar = tqdm(range(0, num_checks), desc='Processing Faces', disable=disable_option)
-            print(num_faces)
+            #print(num_faces)
             face_response_obj = {}
 
             faces = []
@@ -162,8 +162,8 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
                             employee_name = candidate['employee']
                             best_distance = candidate['distance']
                             values_ = candidate[['employee', 'distance']].values
-                            name = values_[0].split("\\")[-1].split("/")[0]
-                            print(values_)
+                            name = str(values_).split("/")[2]
+                            print(name)
                             print("--------------------------------------------------------------")
                             if best_distance <= threshold - Threshold_setter:
 
@@ -188,7 +188,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
             else:
                 Blink = "NOT BLINKING"
             cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
-            cv2.putText(Fin_img, str(name + "-[" + str(Blink) + "]"), (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
+            cv2.putText(Fin_img, str(str(name) + "-[" + str(Blink) + "]"), (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
                         1, (255, 255, 255), 1)
             Listing(name)
             if Blink == "BLINKING":
@@ -199,7 +199,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
             frame = buffer.tobytes()
             freezed_frame = freezed_frame + 1
 
-            print(int(timer))
+            #print(int(timer))
             blinklist.append(Blink)
 
 # split analysis into two parts and return necessary stuff from
