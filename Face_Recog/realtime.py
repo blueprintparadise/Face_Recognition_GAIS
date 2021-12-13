@@ -6,10 +6,15 @@ import cv2
 import time
 import re
 import os
+import mediapipe
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 from Face_Recog import Main_Model
 from Face_Recog.commons import functions, distance as dst
 from Face_Recog.detectors import FaceDetector
+from scipy.spatial import distance as dist
+from tensorflow.keras.models import model_from_json
+
+Threshold_setter = 0.5
 import Liveness_Blinking
 Blink_time = 30
 name_list = []
@@ -17,10 +22,10 @@ def Listing(name):
     name_list.append(name)
     return None
 def api_notification():
-    name = name_list[-5]
+    name = name_list[-1]
     return str(name)
 
-def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', distance_metric='cosine',
+def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', distance_metric='cosine',
              source=0, time_threshold=5, frame_threshold=5):
     blinklist = []
     face_detector = FaceDetector.build_model(detector_backend)
@@ -71,8 +76,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
         raw_img = img.copy()
         if freeze == False:
             # faces stores list of detected_face and region pair
-            faces = FaceDetector.detect_faces(face_detector, detector_backend, img, align=True)
-            print(len(faces))
+            faces = FaceDetector.detect_faces(face_detector, detector_backend, img, align=False)
             if len(faces) == 0:
                 face_included_frames = 0
         else:
@@ -87,8 +91,8 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                 detected_faces.append((x, y, w, h))
                 face_index = face_index + 1
 
-        if face_detected == True and face_included_frames == frame_threshold :
-            #freeze = True
+        if face_detected == True and face_included_frames == frame_threshold and freeze == False:
+            freeze = True
             base_img = raw_img.copy()
             detected_faces_final = detected_faces.copy()
 
@@ -106,6 +110,13 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                     h = detected_face[3]
                     cv2.rectangle(Fin_img, (x, y), (x + w, y + h), (67, 67, 67),
                                   1)  # draw rectangle to main image
+
+                    # apply deep learning for custom_face
+                    live_img = base_img.copy()
+                    #roi_face = live_img[y:y + h, x:x + w]
+                    #roi_face_clr = live_img[y:y + h, x:x + w]
+                    #eyes = eye_cascade.detectMultiScale(roi_face)
+                    #print(eyes)
                     custom_face = base_img[y:y + h, x:x + w]
 
                     #liveornot = Liveness_Detection(live_img, x, y, h, w)
@@ -143,9 +154,9 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                             best_distance = candidate['distance']
                             values_ = candidate[['employee', 'distance']].values
                             name = values_[0].split("\\")[-1].split("/")[0]
-                            #print(values_)
-                            #print("--------------------------------------------------------------")
-                            if best_distance <= threshold :
+                            print(values_)
+                            print("--------------------------------------------------------------")
+                            if best_distance <= threshold - Threshold_setter:
 
                                 display_img = cv2.imread(employee_name)
 
@@ -158,10 +169,10 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                                 cv2.putText(Fin_img, str("Unknown"), (20, 40),
                                             cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 1)
             toc = time.time()
-            #print(blinklist)
+            print(blinklist)
             timer = toc - tic
             if int(timer) % 30 == 0 and sum(blinklist)<4:
-                #print("_____________FAKE______________")
+                print("_____________FAKE______________")
                 blinklist=[]
             if Blink > 0:
                 Blink = "BLINKING"
@@ -179,7 +190,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
             frame = buffer.tobytes()
             freezed_frame = freezed_frame + 1
 
-            #print(int(timer))
+            print(int(timer))
             blinklist.append(Blink)
 
 # split analysis into two parts and return necessary stuff from
@@ -191,17 +202,10 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
 
             freezed_frame = freezed_frame + 1
         else:
-            face_detected = True
+            face_detected = False
             face_included_frames = 0
             freeze = False
             freezed_frame = 0
-            ret, buffer = cv2.imencode('.jpg', raw_img)
-            frame2 = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame2 + b'\r\n')
-
-
-
     if cv2.waitKey(1) & 0xFF == ord('q'):  # press q to quit
             pass
     # kill open cv things

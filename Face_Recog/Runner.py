@@ -151,7 +151,7 @@ def index():
 def video():
     return Response(
         realtime.analysis(db_path, detector_backend=detector_backend, df=df, model_name=model_name, time_threshold=1,
-                          frame_threshold=1),
+                          frame_threshold=1,distance_metric="cosine"),
         mimetype="multipart/x-mixed-replace; boundary=frame")
 
 

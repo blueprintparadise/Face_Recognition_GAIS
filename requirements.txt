@@ -17,10 +17,8 @@ matplotlib
 albumentations
 pyOpenSSL
 argparse
-flask
 mediapipe
 pyopenssl
 cmake
-dlib
 dotmap
 imutils
