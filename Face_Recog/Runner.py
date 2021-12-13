@@ -91,6 +91,7 @@ def Facevideo():
 @app.route('/name',methods=["GET"])
 def get_name():
     name = realtime.api_notification()
+    print("API Called")
     return name
 @app.route('/embed', methods=["GET"])
 def embed(model_name, db_path, detector_backend, distance_metric):
@@ -164,5 +165,5 @@ if __name__ == '__main__':
     # start the flask app
     app.jinja_env.cache = {}
     app.run(host='0.0.0.0', port='7788',threaded=True, debug=False,
-            use_reloader=False,ssl_context='adhoc')
+            use_reloader=False)
 

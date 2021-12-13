@@ -1,5 +1,5 @@
 from Face_Recog.detectors import FaceDetector
-
+import cv2
 
 # Link - https://google.github.io/mediapipe/solutions/face_detection
 
@@ -7,7 +7,7 @@ def build_model():
     import mediapipe as mp
     mp_face_detection = mp.solutions.face_detection
     # min_detection_confidence - "A filter to analyse the training photographs"
-    face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.50)
+    face_detection = mp_face_detection.FaceDetection(min_detection_confidence=0.4)
     # Returns detected face
     return face_detection
 
@@ -18,6 +18,7 @@ def detect_face(face_detector, img, align=True):
     # Regular expressions
     # mp_face_detection = mp.solutions.face_detection
     resp = []
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     results = face_detector.process(img)
     original_size = img.shape
     target_size = (300, 300)
