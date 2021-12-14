@@ -21,10 +21,9 @@ name_list = []
 def Listing(name):
     name_list.append(name)
     return None
-
 def api_notification():
-    name = name_list
-    return name
+    name = name_list[-1]
+    return str(name)
 
 def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', distance_metric='cosine',
              source=0, time_threshold=5, frame_threshold=5,enable_multiple=True):
@@ -69,7 +68,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
     cap = cv2.VideoCapture(source)  # webcam
     while (True):
         ret, img = cap.read()
-        #ret2, img2 = cap.read()
+        ret2, img2 = cap.read()
         Blink = Liveness_Blinking.Liveness(ret = ret, frame = img)
         #print(Blink)
         if img is None:
@@ -78,11 +77,18 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
         if freeze == False:
             # faces stores list of detected_face and region pair
             faces = FaceDetector.detect_faces(face_detector, detector_backend, img, align=True)
-            #print(len(faces))
-            Listing(len(faces))
+            print(len(faces))
             if len(faces) == 0:
                 face_included_frames = 0
         else:
+            num_faces = 1 if not enable_multiple else len(faces)
+            #num_actions = len(actions)
+            #num_checks = num_actions * num_faces
+            #disable_option = num_checks <= 1 or not prog_bar
+            #pbar = tqdm(range(0, num_checks), desc='Processing Faces', disable=disable_option)
+            #print(num_faces)
+            face_response_obj = {}
+
             faces = []
         detected_faces = []
         face_index = 0
@@ -96,7 +102,6 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
 
         if face_detected == True and face_included_frames == frame_threshold and freeze == False:
             freeze = True
-            #Listing(faces)
             base_img = raw_img.copy()
             detected_faces_final = detected_faces.copy()
 
@@ -117,7 +122,10 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
 
                     # apply deep learning for custom_face
                     live_img = base_img.copy()
-
+                    #roi_face = live_img[y:y + h, x:x + w]
+                    #roi_face_clr = live_img[y:y + h, x:x + w]
+                    #eyes = eye_cascade.detectMultiScale(roi_face)
+                    #print(eyes)
                     custom_face = base_img[y:y + h, x:x + w]
 
                     #liveornot = Liveness_Detection(live_img, x, y, h, w)
@@ -154,10 +162,9 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
                             employee_name = candidate['employee']
                             best_distance = candidate['distance']
                             values_ = candidate[['employee', 'distance']].values
-                            #print(len(values_))
                             name = str(values_).split("/")[2]
-                            #print(name)
-                            Listing(name)
+                            print(name)
+                            print("--------------------------------------------------------------")
                             if best_distance <= threshold - Threshold_setter:
 
                                 display_img = cv2.imread(employee_name)
@@ -183,7 +190,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
             cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
             cv2.putText(Fin_img, str(str(name) + "-[" + str(Blink) + "]"), (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
                         1, (255, 255, 255), 1)
-
+            Listing(name)
             if Blink == "BLINKING":
                 Blink=1
             else:
@@ -208,10 +215,6 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
             face_included_frames = 0
             freeze = False
             freezed_frame = 0
-            ret, buffer = cv2.imencode('.jpg', raw_img)
-            frame2 = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame2 + b'\r\n')
     if cv2.waitKey(1) & 0xFF == ord('q'):  # press q to quit
             pass
     # kill open cv things
