@@ -122,10 +122,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
 
                     # apply deep learning for custom_face
                     live_img = base_img.copy()
-                    #roi_face = live_img[y:y + h, x:x + w]
-                    #roi_face_clr = live_img[y:y + h, x:x + w]
-                    #eyes = eye_cascade.detectMultiScale(roi_face)
-                    #print(eyes)
+                    #
                     custom_face = base_img[y:y + h, x:x + w]
 
                     #liveornot = Liveness_Detection(live_img, x, y, h, w)
@@ -215,6 +212,11 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
             face_included_frames = 0
             freeze = False
             freezed_frame = 0
+            ret, buffer = cv2.imencode('.jpg', raw_img)
+            frame2 = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame2 + b'\r\n')
+
     if cv2.waitKey(1) & 0xFF == ord('q'):  # press q to quit
             pass
     # kill open cv things
