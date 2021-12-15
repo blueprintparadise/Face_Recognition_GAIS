@@ -6,18 +6,30 @@ import cv2
 import time
 import re
 import os
-import mediapipe
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 from Face_Recog import Main_Model
 from Face_Recog.commons import functions, distance as dst
 from Face_Recog.detectors import FaceDetector
 from scipy.spatial import distance as dist
 from tensorflow.keras.models import model_from_json
-
+import requests
+notification_time = 5
 Threshold_setter = 0.5
 import Liveness_Blinking
 Blink_time = 30
 name_list = []
+send_name = True
+import asyncio
+url = "https://43.231.127.150:7788/api/notification/sendnotificationtodevice?\
+deviceToken=d1KvOwX8QA6up5WadCqdmw%3AAPA91bGLilFDDDU-BpcdTb-J7EXCbuC3cK5a0TXIcFvD0dDVfB6_1Kb7eVc6h4_mqh4N_c0ip1VaFeCr1_5eYa9t0osDaHnJiqqdczhXA_sT-xwPDUDCVLRP3IN7e9cRYtWen6ky6EdU/\
+&message={}&\
+title=Message_Title"
+#api_url = 'https://43.231.127.150:7788/api/notification/sendnotificationtodevice?'
+#device_token = 'deviceToken=d1KvOwX8QA6up5WadCqdmw%3AAPA91bGLilFDDDU-BpcdTb-J7EXCbuC3cK5a0TXIcFvD0dDVfB6_1Kb7eVc6h4_mqh4N_c0ip1VaFeCr1_5eYa9t0osDaHnJiqqdczhXA_sT-xwPDUDCVLRP3IN7e9cRYtWen6ky6EdU/'
+#message = '&message=API_Message'
+#title = 'title=Message_Title'
 def Listing(name):
     name_list.append(name)
     return None
@@ -25,6 +37,32 @@ def api_notification():
     name = name_list[-1]
     return str(name)
 
+def get_name():
+    lst = []
+    string = ''
+    if len(name_list)>200:
+        time.sleep(notification_time)
+        name = name_list[-1]
+        People_Count = [i for i in name_list if type(i) == int]
+        print(name_list)
+        num_of_people = People_Count[-2]
+        num_of_people = num_of_people * 2
+        Names = [i for i in name if type(i) == str]
+        Username = "".join(Names)
+        #Names = Names[-num_of_people]
+        url_post = url.format(Username)
+        print(url_post)
+        session = requests.Session()
+        retry = Retry(connect=3, backoff_factor=0.5)
+        adapter = HTTPAdapter(max_retries=retry)
+        session.mount('http://', adapter)
+        session.mount('https://', adapter)
+        session.post(url_post)
+        #print(response)
+        # Logic for pushing the notification
+        #print(Names)
+
+    return None
 def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', distance_metric='cosine',
              source=0, time_threshold=5, frame_threshold=5,enable_multiple=True):
     blinklist = []
@@ -78,6 +116,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
             # faces stores list of detected_face and region pair
             faces = FaceDetector.detect_faces(face_detector, detector_backend, img, align=True)
             print(len(faces))
+            Listing(len(faces))
             if len(faces) == 0:
                 face_included_frames = 0
         else:
@@ -104,7 +143,6 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
             freeze = True
             base_img = raw_img.copy()
             detected_faces_final = detected_faces.copy()
-
 
 
             if freezed_frame == 0:
@@ -161,7 +199,8 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
                             values_ = candidate[['employee', 'distance']].values
                             name = str(values_).split("/")[2]
                             print(name)
-                            print("--------------------------------------------------------------")
+                            Listing(name)
+                            #print("--------------------------------------------------------------")
                             if best_distance <= threshold - Threshold_setter:
 
                                 display_img = cv2.imread(employee_name)
@@ -187,7 +226,8 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
             cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
             cv2.putText(Fin_img, str(str(name) + "-[" + str(Blink) + "]"), (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
                         1, (255, 255, 255), 1)
-            Listing(name)
+
+            get_name()
             if Blink == "BLINKING":
                 Blink=1
             else:
