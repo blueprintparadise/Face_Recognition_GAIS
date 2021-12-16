@@ -14,6 +14,7 @@ from Face_Recog.commons import functions, distance as dst
 from Face_Recog.detectors import FaceDetector
 from scipy.spatial import distance as dist
 from tensorflow.keras.models import model_from_json
+import threading
 import requests
 notification_time = 5
 Threshold_setter = 0.5
@@ -24,8 +25,8 @@ send_name = True
 import asyncio
 url = "https://43.231.127.150:7788/api/notification/sendnotificationtodevice?\
 deviceToken=d1KvOwX8QA6up5WadCqdmw%3AAPA91bGLilFDDDU-BpcdTb-J7EXCbuC3cK5a0TXIcFvD0dDVfB6_1Kb7eVc6h4_mqh4N_c0ip1VaFeCr1_5eYa9t0osDaHnJiqqdczhXA_sT-xwPDUDCVLRP3IN7e9cRYtWen6ky6EdU/\
-&message=Rushi&\
-title=Message_Title"
+&message={}&\
+title={}"
 #api_url = 'https://43.231.127.150:7788/api/notification/sendnotificationtodevice?'
 #device_token = 'deviceToken=d1KvOwX8QA6up5WadCqdmw%3AAPA91bGLilFDDDU-BpcdTb-J7EXCbuC3cK5a0TXIcFvD0dDVfB6_1Kb7eVc6h4_mqh4N_c0ip1VaFeCr1_5eYa9t0osDaHnJiqqdczhXA_sT-xwPDUDCVLRP3IN7e9cRYtWen6ky6EdU/'
 #message = '&message=API_Message'
@@ -47,28 +48,13 @@ def get_name():
         print(name_list)
         num_of_people = People_Count[-2]
         num_of_people = num_of_people * 2
-        Names = [i for i in name if type(i) == str]
+        Names = [i for i in name_list if type(i) == str]
+        print(Names)
         Username = "".join(Names)
+        url_post = url.format("Has Arrived",Names[-1])
         #Names = Names[-num_of_people]
-        '''
-        url_post = url.format(Username)
-        print(url_post)
-        session = requests.Session()
-        retry = Retry(connect=3, backoff_factor=0.5)
-        adapter = HTTPAdapter(max_retries=retry)
-        session.mount('http://', adapter)
-        session.mount('https://', adapter)
-        session.post(url_post)
-        #print(response)
-        '''
         # making a rest post api
-        new_url = "https://43.231.127.150:7788/api/notification/sendnotificationtodevice"
-        data = {
-            'deviceToken':"d1KvOwX8QA6up5WadCqdmw%3AAPA91bGLilFDDDU-BpcdTb-J7EXCbuC3cK5a0TXIcFvD0dDVfB6_1Kb7eVc6h4_mqh4N_c0ip1VaFeCr1_5eYa9t0osDaHnJiqqdczhXA_sT-xwPDUDCVLRP3IN7e9cRYtWen6ky6EdU/",
-            'message':"Rushi",
-            'title': "Working"
-        }
-        r = requests.post(url = url,verify=False)
+        r = requests.post(url = url_post,verify=False)
         print(r)
         print("Running")
         # Logic for pushing the notification
@@ -127,7 +113,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
         if freeze == False:
             # faces stores list of detected_face and region pair
             faces = FaceDetector.detect_faces(face_detector, detector_backend, img, align=True)
-            print(len(faces))
+            #print(len(faces))
             Listing(len(faces))
             if len(faces) == 0:
                 face_included_frames = 0
@@ -210,7 +196,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
                             best_distance = candidate['distance']
                             values_ = candidate[['employee', 'distance']].values
                             name = str(values_).split("/")[2]
-                            print(name)
+                            #print(name)
                             Listing(name)
                             #print("--------------------------------------------------------------")
                             if best_distance <= threshold - Threshold_setter:
@@ -239,7 +225,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
             cv2.putText(Fin_img, str(str(name) + "-[" + str(Blink) + "]"), (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
                         1, (255, 255, 255), 1)
 
-            get_name()
+            threading.Thread(target=get_name).start()
             if Blink == "BLINKING":
                 Blink=1
             else:
