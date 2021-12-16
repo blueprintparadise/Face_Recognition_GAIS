@@ -17,14 +17,14 @@ from tensorflow.keras.models import model_from_json
 import requests
 notification_time = 5
 Threshold_setter = 0.5
-import Liveness_Blinking
+from Face_Recog import  Liveness_Blinking
 Blink_time = 30
 name_list = []
 send_name = True
 import asyncio
 url = "https://43.231.127.150:7788/api/notification/sendnotificationtodevice?\
 deviceToken=d1KvOwX8QA6up5WadCqdmw%3AAPA91bGLilFDDDU-BpcdTb-J7EXCbuC3cK5a0TXIcFvD0dDVfB6_1Kb7eVc6h4_mqh4N_c0ip1VaFeCr1_5eYa9t0osDaHnJiqqdczhXA_sT-xwPDUDCVLRP3IN7e9cRYtWen6ky6EdU/\
-&message={}&\
+&message=Rushi&\
 title=Message_Title"
 #api_url = 'https://43.231.127.150:7788/api/notification/sendnotificationtodevice?'
 #device_token = 'deviceToken=d1KvOwX8QA6up5WadCqdmw%3AAPA91bGLilFDDDU-BpcdTb-J7EXCbuC3cK5a0TXIcFvD0dDVfB6_1Kb7eVc6h4_mqh4N_c0ip1VaFeCr1_5eYa9t0osDaHnJiqqdczhXA_sT-xwPDUDCVLRP3IN7e9cRYtWen6ky6EdU/'
@@ -40,7 +40,7 @@ def api_notification():
 def get_name():
     lst = []
     string = ''
-    if len(name_list)>200:
+    if len(name_list)>20:
         time.sleep(notification_time)
         name = name_list[-1]
         People_Count = [i for i in name_list if type(i) == int]
@@ -50,6 +50,7 @@ def get_name():
         Names = [i for i in name if type(i) == str]
         Username = "".join(Names)
         #Names = Names[-num_of_people]
+        '''
         url_post = url.format(Username)
         print(url_post)
         session = requests.Session()
@@ -59,6 +60,17 @@ def get_name():
         session.mount('https://', adapter)
         session.post(url_post)
         #print(response)
+        '''
+        # making a rest post api
+        new_url = "https://43.231.127.150:7788/api/notification/sendnotificationtodevice"
+        data = {
+            'deviceToken':"d1KvOwX8QA6up5WadCqdmw%3AAPA91bGLilFDDDU-BpcdTb-J7EXCbuC3cK5a0TXIcFvD0dDVfB6_1Kb7eVc6h4_mqh4N_c0ip1VaFeCr1_5eYa9t0osDaHnJiqqdczhXA_sT-xwPDUDCVLRP3IN7e9cRYtWen6ky6EdU/",
+            'message':"Rushi",
+            'title': "Working"
+        }
+        r = requests.post(url = url,verify=False)
+        print(r)
+        print("Running")
         # Logic for pushing the notification
         #print(Names)
 

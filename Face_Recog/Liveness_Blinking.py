@@ -1,7 +1,8 @@
 import cv2 as cv
 import mediapipe as mp
 import time
-import utils2, math
+from Face_Recog  import utils2
+import math
 import numpy as np
 global CEF_COUNTER
 # variables
