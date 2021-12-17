@@ -15,8 +15,9 @@ from Face_Recog.detectors import FaceDetector
 from scipy.spatial import distance as dist
 from tensorflow.keras.models import model_from_json
 import threading
+import pafy
 import requests
-notification_time = 5
+notification_time = 10
 Threshold_setter = 0.5
 from Face_Recog import  Liveness_Blinking
 Blink_time = 30
@@ -55,7 +56,9 @@ def get_name():
         #Names = Names[-num_of_people]
         # making a rest post api
         r = requests.post(url = url_post,verify=False)
-        print(r)
+
+        if r.status_code == 200:
+            print("Notification Success")
         print("Running")
         # Logic for pushing the notification
         #print(Names)
@@ -100,8 +103,10 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
     freezed_frame = 0
   #-----------------------------------------------------------------------------------------------------------------------------------------------
 
-
-    cap = cv2.VideoCapture(source)  # webcam
+    url = 'https://youtu.be/NwZsneStpzs'
+    video = pafy.new(url)
+    best = video.getbest(preftype="mp4")
+    cap = cv2.VideoCapture(best.url)  # webcam
     while (True):
         ret, img = cap.read()
         ret2, img2 = cap.read()
@@ -157,7 +162,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
                                   1)  # draw rectangle to main image
 
                     # apply deep learning for custom_face
-                    live_img = base_img.copy()
+                    #live_img = base_img.copy()
                     #
                     custom_face = base_img[y:y + h, x:x + w]
 
