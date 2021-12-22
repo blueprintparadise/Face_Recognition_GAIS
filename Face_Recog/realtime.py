@@ -1,3 +1,4 @@
+#using env in dockerfile pyhton
 import os
 image_path = os.environ['images']
 device_token = os.environ['device']
