@@ -1,5 +1,6 @@
 #using env in dockerfile pyhton
 #https://stackoverflow.com/questions/49770999/docker-env-for-python-variables
+#docker run -e MY_USER=test -e MY_PASS=12345 ... <image-name> ...
 import os
 image_path = os.environ['images']
 device_token = os.environ['device']
