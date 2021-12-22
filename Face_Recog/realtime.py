@@ -1,4 +1,6 @@
 import os
+image_path = os.environ['images']
+device_token = os.environ['device']
 from tqdm import tqdm
 import numpy as np
 import math
@@ -24,8 +26,10 @@ Blink_time = 30
 name_list = []
 send_name = True
 import asyncio
+my_token  = "d1KvOwX8QA6up5WadCqdmw%3AAPA91bGLilFDDDU-BpcdTb-J7EXCbuC3cK5a0TXIcFvD0dDVfB6_1Kb7eVc6h4_mqh4N_c0ip1VaFeCr1_5eYa9t0osDaHnJiqqdczhXA_sT-xwPDUDCVLRP3IN7e9cRYtWen6ky6EdU"
+
 url = "https://43.231.127.150:7788/api/notification/sendnotificationtodevice?\
-deviceToken=d1KvOwX8QA6up5WadCqdmw%3AAPA91bGLilFDDDU-BpcdTb-J7EXCbuC3cK5a0TXIcFvD0dDVfB6_1Kb7eVc6h4_mqh4N_c0ip1VaFeCr1_5eYa9t0osDaHnJiqqdczhXA_sT-xwPDUDCVLRP3IN7e9cRYtWen6ky6EdU/\
+deviceToken={}/\
 &message={}&\
 title={}"
 #api_url = 'https://43.231.127.150:7788/api/notification/sendnotificationtodevice?'
@@ -52,7 +56,7 @@ def get_name():
         Names = [i for i in name_list if type(i) == str]
         print(Names)
         Username = "".join(Names)
-        url_post = url.format("Has Arrived",Names[-1])
+        url_post = url.format(device_token,"Has Arrived",Names[-1])
         #Names = Names[-num_of_people]
         # making a rest post api
         r = requests.post(url = url_post,verify=False)
