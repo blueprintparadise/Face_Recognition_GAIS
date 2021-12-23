@@ -38,7 +38,7 @@ app = Flask(__name__)
 model_name = 'Facenet'
 
 db_path = r"./images"
-detector_backend = 'opencv'
+detector_backend = 'mediapipe'
 ''' Options-'opencv',
          'ssd' ,
          'dlib',
