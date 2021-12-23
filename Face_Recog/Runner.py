@@ -19,7 +19,6 @@ import requests
 outputFrame = None
 import time
 lock = threading.Lock()
-from flask_swagger_ui import get_swaggerui_blueprint
 # For certificate - converting "http" request to "https"
 from OpenSSL import SSL
 '''PLEASE NOTE ---------------------------------------------

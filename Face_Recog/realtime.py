@@ -1,4 +1,6 @@
 import os
+#image_path = os.environ['images']
+#device_token = os.environ['device']
 from tqdm import tqdm
 import numpy as np
 import math
@@ -15,20 +17,26 @@ from Face_Recog.detectors import FaceDetector
 from scipy.spatial import distance as dist
 from tensorflow.keras.models import model_from_json
 import threading
-import pafy
+#import pafy
 import requests
 notification_time = 10
 Threshold_setter = 0.5
 from Face_Recog import  Liveness_Blinking
 Blink_time = 30
 name_list = []
-send_name = True
+from urllib3.exceptions import InsecureRequestWarning
+
+# Suppress only the single warning from urllib3 needed.
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+
 import asyncio
+my_token  = "edtY19-STyOcK1VRHyQ3Z5:APA91bEgZxeRNbZnHDvVXYzckyeTYgxgGs8SP0KV7Jc7i6Xwcd9HCnNc5BEeCmS88cLULp4QCDSpkM3xfdyhx3wScWY9c2hQcdct7ttvWEJmxRU3IRqfNcpj1E7X1DxdbKn4kj2sg2G_"
+
 url = "https://43.231.127.150:7788/api/notification/sendnotificationtodevice?\
-deviceToken=d1KvOwX8QA6up5WadCqdmw%3AAPA91bGLilFDDDU-BpcdTb-J7EXCbuC3cK5a0TXIcFvD0dDVfB6_1Kb7eVc6h4_mqh4N_c0ip1VaFeCr1_5eYa9t0osDaHnJiqqdczhXA_sT-xwPDUDCVLRP3IN7e9cRYtWen6ky6EdU/\
+deviceToken={}/\
 &message={}&\
 title={}"
-#api_url = 'https://43.231.127.150:7788/api/notification/sendnotificationtodevice?'
+#api_url = 'https://43.231.127.150:7788/api/notification/sendnotificationtodevice'?
 #device_token = 'deviceToken=d1KvOwX8QA6up5WadCqdmw%3AAPA91bGLilFDDDU-BpcdTb-J7EXCbuC3cK5a0TXIcFvD0dDVfB6_1Kb7eVc6h4_mqh4N_c0ip1VaFeCr1_5eYa9t0osDaHnJiqqdczhXA_sT-xwPDUDCVLRP3IN7e9cRYtWen6ky6EdU/'
 #message = '&message=API_Message'
 #title = 'title=Message_Title'
@@ -43,23 +51,24 @@ def get_name():
     lst = []
     string = ''
     if len(name_list)>20:
-        time.sleep(notification_time)
-        name = name_list[-1]
-        People_Count = [i for i in name_list if type(i) == int]
-        print(name_list)
-        num_of_people = People_Count[-2]
-        num_of_people = num_of_people * 2
-        Names = [i for i in name_list if type(i) == str]
-        print(Names)
-        Username = "".join(Names)
-        url_post = url.format("Has Arrived",Names[-1])
-        #Names = Names[-num_of_people]
-        # making a rest post api
-        r = requests.post(url = url_post,verify=False)
-
-        if r.status_code == 200:
-            print("Notification Success")
-        print("Running")
+        for name in range(5):
+            time.sleep(notification_time)
+            name = name_list[-1]
+            People_Count = [i for i in name_list if type(i) == int]
+            print(name_list)
+            num_of_people = People_Count[-2]
+            num_of_people = num_of_people * 2
+            Names = [i for i in name_list if type(i) == str]
+            print(Names)
+            Username = "".join(Names)
+            url_post = url.format(str(my_token),"Has Arrived",Names[-1])
+            #Names = Names[-num_of_people]
+            # making a rest post api
+            r = requests.post(url = url_post,verify=False)
+            print(r)
+            if r.status_code == 200:
+                print("Notification Success")
+            print("Running")
         # Logic for pushing the notification
         #print(Names)
 
@@ -102,11 +111,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
     face_included_frames = 0  # freeze screen if face detected sequantially 5 frames
     freezed_frame = 0
   #-----------------------------------------------------------------------------------------------------------------------------------------------
-
-    url = 'https://youtu.be/NwZsneStpzs'
-    video = pafy.new(url)
-    best = video.getbest(preftype="mp4")
-    cap = cv2.VideoCapture(best.url)  # webcam
+    cap = cv2.VideoCapture(0)  # webcam
     while (True):
         ret, img = cap.read()
         ret2, img2 = cap.read()
