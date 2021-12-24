@@ -1,6 +1,7 @@
 import os
-#image_path = os.environ['images']
-#device_token = os.environ['device']
+image_path = os.environ['images']
+device_token = os.environ['token']
+from cv2 import CAP_V4L2
 from tqdm import tqdm
 import numpy as np
 import math
@@ -61,7 +62,7 @@ def get_name():
             Names = [i for i in name_list if type(i) == str]
             print(Names)
             Username = "".join(Names)
-            url_post = url.format(str(my_token),"Has Arrived",Names[-1])
+            url_post = url.format(str(device_token),"Has Arrived",Names[-1])
             #Names = Names[-num_of_people]
             # making a rest post api
             r = requests.post(url = url_post,verify=False)
@@ -73,7 +74,7 @@ def get_name():
         #print(Names)
 
     return None
-def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', distance_metric='cosine',
+def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', distance_metric='cosine',
              source=0, time_threshold=5, frame_threshold=5,enable_multiple=True):
     blinklist = []
     face_detector = FaceDetector.build_model(detector_backend)
@@ -83,8 +84,8 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
 
     employees = []
     # check passed db folder exists
-    if os.path.isdir(db_path) == True:
-        for r, d, f in os.walk(db_path):  # r=root, d=directories, f = files
+    if os.path.isdir(image_path) == True:
+        for r, d, f in os.walk(image_path):  # r=root, d=directories, f = files
             for file in f:
                 if ('.jpg' in file):
                     # exact_path = os.path.join(r, file)
@@ -92,7 +93,7 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
                     employees.append(exact_path)
 
     if len(employees) == 0:
-        print("WARNING: There is no image in this path ( ", db_path, ") . Face recognition will not be performed.")
+        print("WARNING: There is no image in this path ( ", image_path, ") . Face recognition will not be performed.")
 
     if len(employees) > 0:
         model = Main_Model.build_model(model_name)
@@ -114,7 +115,6 @@ def analysis(db_path, df, model_name='VGG-Face', detector_backend='opencv', dist
     cap = cv2.VideoCapture(0)  # webcam
     while (True):
         ret, img = cap.read()
-        ret2, img2 = cap.read()
         Blink = Liveness_Blinking.Liveness(ret = ret, frame = img)
         #print(Blink)
         if img is None:
