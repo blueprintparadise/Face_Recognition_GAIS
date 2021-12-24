@@ -1,6 +1,6 @@
 import os
-image_path = os.environ['images']
-device_token = os.environ['token']
+#image_path = os.environ['images']
+#device_token = os.environ['token']
 from cv2 import CAP_V4L2
 from tqdm import tqdm
 import numpy as np
@@ -47,6 +47,9 @@ def Listing(name):
 def api_notification():
     name = name_list[-1]
     return str(name)
+eof = '''2, 'images\\\\Rushi', 'images\\\\Akshay', 2, 'images\\\\Rushi', 'images\\\\Akshay', 2, 'images\\\\Rushi', 'images\\\\Rajan', 1]
+['images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 
+'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan']'''
 
 def get_name():
     lst = []
@@ -56,13 +59,22 @@ def get_name():
             time.sleep(notification_time)
             name = name_list[-1]
             People_Count = [i for i in name_list if type(i) == int]
-            print(name_list)
+            #print(name_list)
             num_of_people = People_Count[-2]
             num_of_people = num_of_people * 2
+            print(num_of_people)
             Names = [i for i in name_list if type(i) == str]
-            print(Names)
-            Username = "".join(Names)
-            url_post = url.format(str(device_token),"Has Arrived",Names[-1])
+
+            new_names = []
+            for i in Names:
+                new = i.replace("images\\\\", "")
+                new_names.append(new)
+
+            fin_names = new_names[-num_of_people:]
+            print(fin_names)
+            uniqueNames = set(fin_names)
+            upd_names = list(uniqueNames)
+            url_post = url.format(str(my_token),"Has Arrived",upd_names)
             #Names = Names[-num_of_people]
             # making a rest post api
             r = requests.post(url = url_post,verify=False)
@@ -84,8 +96,8 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
 
     employees = []
     # check passed db folder exists
-    if os.path.isdir(image_path) == True:
-        for r, d, f in os.walk(image_path):  # r=root, d=directories, f = files
+    if os.path.isdir(db_path) == True:
+        for r, d, f in os.walk(db_path):  # r=root, d=directories, f = files
             for file in f:
                 if ('.jpg' in file):
                     # exact_path = os.path.join(r, file)
@@ -93,7 +105,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                     employees.append(exact_path)
 
     if len(employees) == 0:
-        print("WARNING: There is no image in this path ( ", image_path, ") . Face recognition will not be performed.")
+        print("WARNING: There is no image in this path ( ", db_path, ") . Face recognition will not be performed.")
 
     if len(employees) > 0:
         model = Main_Model.build_model(model_name)
@@ -205,7 +217,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                             employee_name = candidate['employee']
                             best_distance = candidate['distance']
                             values_ = candidate[['employee', 'distance']].values
-                            name = str(values_).split("/")[2]
+                            name = str(values_).split("/")[1]
                             #print(name)
                             Listing(name)
                             #print("--------------------------------------------------------------")
