@@ -1,6 +1,7 @@
 import os
 #image_path = os.environ['images']
 #device_token = os.environ['token']
+os.environ['OPENCV_TEST_DATA_PATH']
 from tqdm import tqdm
 import numpy as np
 import math
