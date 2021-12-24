@@ -17,6 +17,7 @@ import os
 import pandas as pd
 import threading
 import requests
+image_path = os.environ['images']
 outputFrame = None
 import time
 lock = threading.Lock()
@@ -38,7 +39,7 @@ app = Flask(__name__)
 # Using "Facenet" and "Mediapipe" recommended
 model_name = 'Facenet'
 
-db_path = r"Face_Recog/images"
+db_path = image_path
 detector_backend = 'mediapipe'
 ''' Options-'opencv',
          'ssd' ,
