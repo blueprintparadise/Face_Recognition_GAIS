@@ -1,11 +1,10 @@
 import os
 #image_path = os.environ['images']
 #device_token = os.environ['token']
-os.environ['OPENCV_TEST_DATA_PATH']
 from tqdm import tqdm
 import numpy as np
 import math
-file1 = open(r"C:\Users\globa\Downloads\Face_Recognition_GAIS\Face_Recog\text.txt","r+")
+file1 = open(r"C:\Users\globa\Downloads\Face_Recognition_GAIS\Face_Recog/text.txt","r+")
 import cv2
 import time
 import re
@@ -27,8 +26,7 @@ from Face_Recog import  Liveness_Blinking
 Blink_time = 30
 name_list = []
 from urllib3.exceptions import InsecureRequestWarning
-#create file here..
-file1 = open(r"C:\Users\globa\Downloads\Face_Recognition_GAIS\Face_Recog\text.txt","r+")
+file1 = open(r"C:\Users\globa\Downloads\Face_Recognition_GAIS\Face_Recog/text.txt","r+")
 # Suppress only the single warning from urllib3 needed.
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
