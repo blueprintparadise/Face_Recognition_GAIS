@@ -50,6 +50,7 @@ detector_backend = 'mediapipe'
 # distance_metric - used to judge distance between video_feed and database image
 distance_metric = 'cosine'
 input_shape = (224, 224)
+# Read a file
 
 @app.route("/Facevideo",methods=['GET','POST'])
 def Facevideo():
@@ -157,6 +158,7 @@ if __name__ == '__main__':
     # start a thread that will perform web stream
     df = embed(model_name, db_path, detector_backend, distance_metric)
     t = threading.Thread()
+    flag = True
     t.daemon = True
     print("System Running Succesfully")
     t.start()
