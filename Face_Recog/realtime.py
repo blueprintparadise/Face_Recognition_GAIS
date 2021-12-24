@@ -1,10 +1,12 @@
 import os
-#image_path = os.environ['images']
-#device_token = os.environ['token']
+image_path = os.environ['images']
+device_token = os.environ['token']
 from tqdm import tqdm
 import numpy as np
 import math
-file1 = open(r"C:\Users\globa\Downloads\Face_Recognition_GAIS\Face_Recog/text.txt","r+")
+with open('Face_Recog/myfile.txt', 'w') as fp:
+    fp.write('y')
+file1 = open(r"Face_Recog/myfile.txt","r+")
 import cv2
 import time
 import re
@@ -26,7 +28,7 @@ from Face_Recog import  Liveness_Blinking
 Blink_time = 30
 name_list = []
 from urllib3.exceptions import InsecureRequestWarning
-file1 = open(r"C:\Users\globa\Downloads\Face_Recognition_GAIS\Face_Recog/text.txt","r+")
+file1 = open("Face_Recog/myfile.txt","r+")
 # Suppress only the single warning from urllib3 needed.
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
@@ -62,17 +64,16 @@ def get_name():
             num_of_people = num_of_people * 2
             print(num_of_people)
             Names = [i for i in name_list if type(i) == str]
-
+            print(Names)
             new_names = []
             for i in Names:
                 new = i.replace("images\\\\", "")
                 new_names.append(new)
 
             fin_names = new_names[-num_of_people:]
-            print(fin_names)
             uniqueNames = set(fin_names)
             upd_names = list(uniqueNames)
-            url_post = url.format(str(my_token),"Has Arrived",upd_names)
+            url_post = url.format(str(device_token),"Has Arrived",upd_names)
             #Names = Names[-num_of_people]
             # making a rest post api
             '''s = requests.Session()
@@ -102,8 +103,8 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
 
     employees = []
     # check passed db folder exists
-    if os.path.isdir(db_path) == True:
-        for r, d, f in os.walk(db_path):  # r=root, d=directories, f = files
+    if os.path.isdir(image_path) == True:
+        for r, d, f in os.walk(image_path):  # r=root, d=directories, f = files
             for file in f:
                 if ('.jpg' in file):
                     # exact_path = os.path.join(r, file)
@@ -111,7 +112,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                     employees.append(exact_path)
 
     if len(employees) == 0:
-        print("WARNING: There is no image in this path ( ", db_path, ") . Face recognition will not be performed.")
+        print("WARNING: There is no image in this path ( ", image_path, ") . Face recognition will not be performed.")
 
     if len(employees) > 0:
         model = Main_Model.build_model(model_name)
@@ -223,7 +224,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                             employee_name = candidate['employee']
                             best_distance = candidate['distance']
                             values_ = candidate[['employee', 'distance']].values
-                            name = str(values_).split("/")[1]
+                            name = str(values_).split("/")[2]
                             #print(name)
                             Listing(name)
                             #print("--------------------------------------------------------------")
@@ -250,8 +251,8 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
             else:
                 Blink = "NOT BLINKING"
             cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
-            cv2.putText(Fin_img, str(str(name)), (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
-                        1, (255, 255, 255), 1)
+            #cv2.putText(Fin_img, str(str(name)), (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
+            #            1, (255, 255, 255), 1)
 
             threading.Thread(target=get_name).start()
             if Blink == "BLINKING":
