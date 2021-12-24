@@ -162,7 +162,7 @@ if __name__ == '__main__':
     t.daemon = True
     print("System Running Succesfully")
     t.start()
-    # start the flask app
+    # start the flask app r
     app.jinja_env.cache = {}
     app.run(host='0.0.0.0', port='8080',threaded=True)
 
