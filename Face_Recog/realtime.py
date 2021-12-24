@@ -1,10 +1,10 @@
 import os
 #image_path = os.environ['images']
 #device_token = os.environ['token']
-from cv2 import CAP_V4L2
 from tqdm import tqdm
 import numpy as np
 import math
+file1 = open(r"C:\Users\globa\Downloads\Face_Recognition_GAIS\Face_Recog\text.txt","r+")
 import cv2
 import time
 import re
@@ -20,27 +20,24 @@ from tensorflow.keras.models import model_from_json
 import threading
 #import pafy
 import requests
-notification_time = 10
+notification_time = 5
 Threshold_setter = 0.5
 from Face_Recog import  Liveness_Blinking
 Blink_time = 30
 name_list = []
 from urllib3.exceptions import InsecureRequestWarning
-
+#create file here..
+file1 = open(r"C:\Users\globa\Downloads\Face_Recognition_GAIS\Face_Recog\text.txt","r+")
 # Suppress only the single warning from urllib3 needed.
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 import asyncio
 my_token  = "edtY19-STyOcK1VRHyQ3Z5:APA91bEgZxeRNbZnHDvVXYzckyeTYgxgGs8SP0KV7Jc7i6Xwcd9HCnNc5BEeCmS88cLULp4QCDSpkM3xfdyhx3wScWY9c2hQcdct7ttvWEJmxRU3IRqfNcpj1E7X1DxdbKn4kj2sg2G_"
-
 url = "https://43.231.127.150:7788/api/notification/sendnotificationtodevice?\
 deviceToken={}/\
 &message={}&\
 title={}"
-#api_url = 'https://43.231.127.150:7788/api/notification/sendnotificationtodevice'?
-#device_token = 'deviceToken=d1KvOwX8QA6up5WadCqdmw%3AAPA91bGLilFDDDU-BpcdTb-J7EXCbuC3cK5a0TXIcFvD0dDVfB6_1Kb7eVc6h4_mqh4N_c0ip1VaFeCr1_5eYa9t0osDaHnJiqqdczhXA_sT-xwPDUDCVLRP3IN7e9cRYtWen6ky6EdU/'
-#message = '&message=API_Message'
-#title = 'title=Message_Title'
+
 def Listing(name):
     name_list.append(name)
     return None
@@ -51,12 +48,14 @@ eof = '''2, 'images\\\\Rushi', 'images\\\\Akshay', 2, 'images\\\\Rushi', 'images
 ['images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 
 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan']'''
 
+# read file and text
+
 def get_name():
+    flag = True
     lst = []
     string = ''
+    print("get_name get called")
     if len(name_list)>20:
-        for name in range(5):
-            time.sleep(notification_time)
             name = name_list[-1]
             People_Count = [i for i in name_list if type(i) == int]
             #print(name_list)
@@ -77,10 +76,18 @@ def get_name():
             url_post = url.format(str(my_token),"Has Arrived",upd_names)
             #Names = Names[-num_of_people]
             # making a rest post api
-            r = requests.post(url = url_post,verify=False)
-            print(r)
-            if r.status_code == 200:
-                print("Notification Success")
+            '''s = requests.Session()
+            request = requests.Request("POST",url_post)
+            prepaired_request = s.prepare_request(request)
+            settings = s.merge_environment_settings(prepaired_request.url,None,None,None)
+            response = s.send(prepaired_request,**settings)'''
+            if file1.read()=='y':
+                r = requests.post(url = url_post,verify=False)
+                print(r)
+                if r.status_code == 200:
+                    print("Notification Success")
+                    file1.write('n')
+            time.sleep(5)
             print("Running")
         # Logic for pushing the notification
         #print(Names)
@@ -244,7 +251,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
             else:
                 Blink = "NOT BLINKING"
             cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
-            cv2.putText(Fin_img, str(str(name) + "-[" + str(Blink) + "]"), (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
+            cv2.putText(Fin_img, str(str(name)), (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
                         1, (255, 255, 255), 1)
 
             threading.Thread(target=get_name).start()
