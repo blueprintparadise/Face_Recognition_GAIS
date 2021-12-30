@@ -1,11 +1,16 @@
 import os
-image_path = os.environ['images']
-device_token = os.environ['token']
+import datetime
+import time
+#image_path = os.environ['images']
+#device_token = os.environ['token']
+import mysql.connector
 from tqdm import tqdm
 import numpy as np
 import math
 with open('Face_Recog/myfile.txt', 'w') as fp:
-    fp.write('y')
+    x = datetime.datetime.now()
+    print(str(x.strftime("%X")))
+    fp.write(str(x.strftime("%X")))
 file1 = open(r"Face_Recog/myfile.txt","r+")
 import cv2
 import time
@@ -28,16 +33,34 @@ from Face_Recog import  Liveness_Blinking
 Blink_time = 30
 name_list = []
 from urllib3.exceptions import InsecureRequestWarning
-file1 = open("Face_Recog/myfile.txt","r+")
+mydb = mysql.connector.connect(host="43.231.127.150",port = "3306", user="usha-jagadambe", passwd="Gais@2020$usha-jagadambe", database="securitydb",
+                                           auth_plugin='mysql_native_password')
+
 # Suppress only the single warning from urllib3 needed.
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 import asyncio
-my_token  = "edtY19-STyOcK1VRHyQ3Z5:APA91bEgZxeRNbZnHDvVXYzckyeTYgxgGs8SP0KV7Jc7i6Xwcd9HCnNc5BEeCmS88cLULp4QCDSpkM3xfdyhx3wScWY9c2hQcdct7ttvWEJmxRU3IRqfNcpj1E7X1DxdbKn4kj2sg2G_"
+#my_token  = "f0QJitMCQc6UHtt2pJWa7S:APA91bESm9UDipNbPPA4SG-unn-e6VFInm15Rp4O5IaiaBrcjbBTzEoFzymx2CfkiPwaxaIo5d_wgvWZbOpYFF2Mzmmm_eZWMtYwhQ2JbQc9o7MzbyMOk6H7kUQi4Q7lPE0lBnRDMRxS"
 url = "https://43.231.127.150:7788/api/notification/sendnotificationtodevice?\
 deviceToken={}/\
 &message={}&\
 title={}"
+
+def get_token():
+    mycursor = mydb.cursor(buffered=True)
+    query = "select token from tb_user where id=1"
+    mycursor.execute(query)
+    row = mycursor.fetchone()
+    mycursor.close()
+    mydb.commit()
+
+    return  row
+
+def convert(date_time):
+    format = '%X'  # The format
+    datetime_str = datetime.datetime.strptime(date_time, format)
+    return datetime_str
+
 
 def Listing(name):
     name_list.append(name)
@@ -52,43 +75,36 @@ eof = '''2, 'images\\\\Rushi', 'images\\\\Akshay', 2, 'images\\\\Rushi', 'images
 # read file and text
 
 def get_name():
-    flag = True
-    lst = []
-    string = ''
-    print("get_name get called")
     if len(name_list)>20:
-            name = name_list[-1]
+            print("Inside Get_Name")
             People_Count = [i for i in name_list if type(i) == int]
-            #print(name_list)
             num_of_people = People_Count[-2]
             num_of_people = num_of_people * 2
-            print(num_of_people)
             Names = [i for i in name_list if type(i) == str]
-            print(Names)
             new_names = []
             for i in Names:
                 new = i.replace("images\\\\", "")
                 new_names.append(new)
-
             fin_names = new_names[-num_of_people:]
             uniqueNames = set(fin_names)
             upd_names = list(uniqueNames)
-            url_post = url.format(str(device_token),"Has Arrived",upd_names)
-            #Names = Names[-num_of_people]
-            # making a rest post api
-            '''s = requests.Session()
-            request = requests.Request("POST",url_post)
-            prepaired_request = s.prepare_request(request)
-            settings = s.merge_environment_settings(prepaired_request.url,None,None,None)
-            response = s.send(prepaired_request,**settings)'''
-            if file1.read()=='y':
+            #-------------------------------------------------------------------------------------------------------------
+            the_token = get_token()
+            print(the_token)
+            url_post = url.format(str(the_token),"Has Arrived",upd_names)
+            file1 = open("Face_Recog/myfile.txt", "r+")
+            x = file1.read()
+            now = datetime.datetime.now().strftime("%X")
+            c = convert(str(now)) - convert(str(x))
+            if float(c.total_seconds())>10:
+
                 r = requests.post(url = url_post,verify=False)
-                print(r)
                 if r.status_code == 200:
-                    print("Notification Success")
-                    file1.write('n')
-            time.sleep(5)
-            print("Running")
+                    file1.seek(0)
+                    file1.truncate(0)
+                    file1.write(str(datetime.datetime.now().strftime("%X")))
+                    print(file1.read())
+
         # Logic for pushing the notification
         #print(Names)
 
@@ -103,8 +119,8 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
 
     employees = []
     # check passed db folder exists
-    if os.path.isdir(image_path) == True:
-        for r, d, f in os.walk(image_path):  # r=root, d=directories, f = files
+    if os.path.isdir(db_path) == True:
+        for r, d, f in os.walk(db_path):  # r=root, d=directories, f = files
             for file in f:
                 if ('.jpg' in file):
                     # exact_path = os.path.join(r, file)
@@ -112,7 +128,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                     employees.append(exact_path)
 
     if len(employees) == 0:
-        print("WARNING: There is no image in this path ( ", image_path, ") . Face recognition will not be performed.")
+        print("WARNING: There is no image in this path ( ", db_path, ") . Face recognition will not be performed.")
 
     if len(employees) > 0:
         model = Main_Model.build_model(model_name)
@@ -142,8 +158,9 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
         if freeze == False:
             # faces stores list of detected_face and region pair
             faces = FaceDetector.detect_faces(face_detector, detector_backend, img, align=True)
-            #print(len(faces))
+            print(len(faces))
             Listing(len(faces))
+
             if len(faces) == 0:
                 face_included_frames = 0
         else:
@@ -224,7 +241,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                             employee_name = candidate['employee']
                             best_distance = candidate['distance']
                             values_ = candidate[['employee', 'distance']].values
-                            name = str(values_).split("/")[2]
+                            name = employee_name
                             #print(name)
                             Listing(name)
                             #print("--------------------------------------------------------------")
