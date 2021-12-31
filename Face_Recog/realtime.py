@@ -51,10 +51,13 @@ def get_token():
     query = "select token from tb_user where id=1"
     mycursor.execute(query)
     row = mycursor.fetchone()
+    tok = "".join(row)
+    print(type(tok))
+    print(tok)
     mycursor.close()
     mydb.commit()
 
-    return  row
+    return  str(tok)
 
 def convert(date_time):
     format = '%X'  # The format
