@@ -52,8 +52,6 @@ def get_token():
     mycursor.execute(query)
     row = mycursor.fetchone()
     tok = "".join(row)
-    print(type(tok))
-    print(tok)
     mycursor.close()
     mydb.commit()
 
@@ -71,15 +69,11 @@ def Listing(name):
 def api_notification():
     name = name_list[-1]
     return str(name)
-eof = '''2, 'images\\\\Rushi', 'images\\\\Akshay', 2, 'images\\\\Rushi', 'images\\\\Akshay', 2, 'images\\\\Rushi', 'images\\\\Rajan', 1]
-['images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 
-'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Akshay', 'images\\\\Rushi', 'images\\\\Rajan']'''
 
 # read file and text
 
 def get_name():
     if len(name_list)>20:
-            print("Inside Get_Name")
             People_Count = [i for i in name_list if type(i) == int]
             num_of_people = People_Count[-2]
             num_of_people = num_of_people * 2
@@ -93,13 +87,12 @@ def get_name():
             upd_names = list(uniqueNames)
             #-------------------------------------------------------------------------------------------------------------
             the_token = get_token()
-            print(the_token)
             url_post = url.format(str(the_token),"Has Arrived",upd_names)
             file1 = open("Face_Recog/myfile.txt", "r+")
             x = file1.read()
             now = datetime.datetime.now().strftime("%X")
             c = convert(str(now)) - convert(str(x))
-            if float(c.total_seconds())>10:
+            if float(c.total_seconds())>20:
 
                 r = requests.post(url = url_post,verify=False)
                 if r.status_code == 200:
@@ -161,7 +154,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
         if freeze == False:
             # faces stores list of detected_face and region pair
             faces = FaceDetector.detect_faces(face_detector, detector_backend, img, align=True)
-            print(len(faces))
+            #print(len(faces))
             Listing(len(faces))
 
             if len(faces) == 0:
@@ -245,7 +238,6 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                             best_distance = candidate['distance']
                             values_ = candidate[['employee', 'distance']].values
                             name = employee_name
-                            #print(name)
                             Listing(name)
                             #print("--------------------------------------------------------------")
                             if best_distance <= threshold - Threshold_setter:
@@ -264,16 +256,12 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
             #print(blinklist)
             timer = toc - tic
             if int(timer) % 30 == 0 and sum(blinklist)<4:
-                #print("_____________FAKE______________")
                 blinklist=[]
             if Blink > 0:
                 Blink = "BLINKING"
             else:
                 Blink = "NOT BLINKING"
             cv2.rectangle(Fin_img, (10, 10), (400, 50), (67, 67, 67), -10)
-            #cv2.putText(Fin_img, str(str(name)), (20, 40), cv2.FONT_HERSHEY_SIMPLEX,
-            #            1, (255, 255, 255), 1)
-
             threading.Thread(target=get_name).start()
             if Blink == "BLINKING":
                 Blink=1
