@@ -11,19 +11,22 @@ import threading
 # Fancy Progress Bars
 import cv2
 from tqdm import tqdm
+
 global offset
 offset = False
 import os
 import pandas as pd
 import threading
 import requests
-image_path = os.environ['images']
+
 outputFrame = None
 import time
+
 lock = threading.Lock()
-#from flask_swagger_ui import get_swaggerui_blueprint
+# from flask_swagger_ui import get_swaggerui_blueprint
 # For certificate - converting "http" request to "https"
-#from OpenSSL import SSL
+from OpenSSL import SSL
+
 '''PLEASE NOTE ---------------------------------------------
     The min_detection_confidence in Mediapipe
     And 
@@ -34,13 +37,13 @@ time_buffer = True
 # Needed to ensure streaming works on multiple devices
 lock = threading.Lock()
 app = Flask(__name__)
-#app.register_blueprint(request_api.get_blueprint())
+# app.register_blueprint(request_api.get_blueprint())
 # Initializing Necessary model for recognition/detection
 # Using "Facenet" and "Mediapipe" recommended
 model_name = 'Facenet'
 
-db_path = image_path
-detector_backend = 'mediapipe'
+db_path = r"Face_Recog/images"
+detector_backend = 'opencv'
 ''' Options-'opencv',
          'ssd' ,
          'dlib',
@@ -51,9 +54,9 @@ detector_backend = 'mediapipe'
 # distance_metric - used to judge distance between video_feed and database image
 distance_metric = 'cosine'
 input_shape = (224, 224)
-# Read a file
 
-@app.route("/Facevideo",methods=['GET','POST'])
+
+@app.route("/Facevideo", methods=['GET', 'POST'])
 def Facevideo():
     # cam = cv2.VideoCapture(0)
     #
@@ -91,7 +94,56 @@ def Facevideo():
     response = requests.Response()
     print(response)
     return "Runing"
+
+
 # Embedding Images to dataframe
+'''
+[1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi',
+1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi',
+1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Rushi', 1, 'Akshay', 1, 'Akshay', 1, 'Akshay', 1, 'Akshay', 1, 'Akshay', 1,
+'Rushi', 1, 'Rushi', 1, 'Akshay', 1, 'Rushi', 1, 'Rushi', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi',
+'Akshay', 2, 'Rushi', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 2, 'Rushi', 'Akshay', 3,
+'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay',
+'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi',
+'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3,
+'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi',
+'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay',
+2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2,
+'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi',
+'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3,
+'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay',
+'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 2, 'Rushi',
+'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Pranay', 'Akshay',
+2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Pranay', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2,
+'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi', 'Akshay', 2, 'Rushi',
+'Akshay', 2, 'Rushi', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay',
+'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Pranay', 'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Rushi',
+'Akshay', 'Akshay', 3, 'Rushi', 'Akshay', 'Akshay', 3, 'Pranay', 'Akshay', 'Akshay', 3, 'Pawan', 'Akshay', 'Akshay', 2,
+'Akshay', 'Akshay', 2, 'Akshay', 'Akshay', 2, 'Akshay', 'Akshay', 2, 'Akshay', 'Akshay', 3, 'Pawan', 'Akshay', 'Akshay',
+3, 'Akshay', 'Akshay', 'Akshay', 3, 'Pawan', 'Akshay', 'Akshay', 3]
+'''
+
+
+def notification_logic():
+    pass
+
+
+@app.route('/name', methods=["GET"])
+def get_name():
+    lst = []
+    string = ''
+    name = realtime.api_notification()
+    People_Count = [i for i in name if type(i) == int]
+    num_of_people = People_Count[-2]
+    num_of_people = num_of_people * 2
+    Names = [i for i in name if type(i) == str]
+    Names = Names[-num_of_people]
+    print(Names)
+
+    # final_x = int(final_x*2)
+    # final_x_2= final_x_2[-final_x]
+
+    return '01'
 
 
 @app.route('/embed', methods=["GET"])
@@ -134,6 +186,8 @@ def embed(model_name, db_path, detector_backend, distance_metric):
     df['distance_metric'] = distance_metric
     # returns dataframe with employee, embedding and distance_metric information
     return df
+
+
 @app.route('/retrn', methods=["GET"])
 def retrn():
     emb = embed(model_name, db_path, detector_backend, distance_metric)
@@ -141,6 +195,8 @@ def retrn():
     for i in emb['embedding']:
         lst = str(lst) + str(i)
     return lst
+
+
 @app.route("/")
 def index():
     # return the rendered template
@@ -151,7 +207,7 @@ def index():
 def video():
     return Response(
         realtime.analysis(db_path, detector_backend=detector_backend, df=df, model_name=model_name, time_threshold=1,
-                          frame_threshold=1,distance_metric="cosine"),
+                          frame_threshold=1, distance_metric="cosine"),
         mimetype="multipart/x-mixed-replace; boundary=frame")
 
 
@@ -159,11 +215,10 @@ if __name__ == '__main__':
     # start a thread that will perform web stream
     df = embed(model_name, db_path, detector_backend, distance_metric)
     t = threading.Thread()
-    flag = True
     t.daemon = True
     print("System Running Succesfully")
     t.start()
-    # start the flask app r
+    # start the flask app
     app.jinja_env.cache = {}
-    app.run(host='0.0.0.0', port='8080',threaded=True)
-
+    app.run(host='0.0.0.0', port='8880', threaded=True, debug=False
+            )

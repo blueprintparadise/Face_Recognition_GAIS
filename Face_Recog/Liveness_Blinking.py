@@ -136,11 +136,11 @@ def Liveness(ret,frame,frame_counter=frame_counter,TOTAL_BLINKS=TOTAL_BLINKS):
                              cv.LINE_AA)
 
             # calculating  frame per seconds FPS
-            end_time = time.time() - start_time
-            fps = frame_counter / end_time
+ #           end_time = time.time() - start_time
+#            fps = frame_counter / end_time
 
-            frame = utils2.textWithBackground(frame, f'FPS: {round(fps, 1)}', FONTS, 1.0, (30, 50), bgOpacity=0.9,
-                                             textThickness=2)
+ #           frame = utils2.textWithBackground(frame, f'FPS: {round(fps, 1)}', FONTS, 1.0, (30, 50), bgOpacity=0.9,
+  #                                           textThickness=2)
             # writing image for thumbnail drawing shape
             # cv.imwrite(f'img/frame_{frame_counter}.png', frame)
             #cv.imshow('frame', frame)
