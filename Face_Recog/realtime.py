@@ -48,13 +48,13 @@ title={}"
 
 def get_token():
     mycursor = mydb.cursor(buffered=True)
-    query = "select token from tb_user where id=1"
+    query = "select token from tb_user order by id DESC limit 1;"
     mycursor.execute(query)
     row = mycursor.fetchone()
     tok = "".join(row)
     mycursor.close()
     mydb.commit()
-
+    print(tok)
     return  str(tok)
 
 def convert(date_time):
@@ -85,13 +85,12 @@ def get_name():
             fin_names = new_names[-num_of_people:]
             uniqueNames = set(fin_names)
             upd_names = list(uniqueNames)
-            #-------------------------------------------------------------------------------------------------------------
             the_token = get_token()
             url_post = url.format(str(the_token),"Has Arrived",upd_names)
             file1 = open("Face_Recog/myfile.txt", "r+")
-            x = file1.read()
+            filetime = file1.read()
             now = datetime.datetime.now().strftime("%X")
-            c = convert(str(now)) - convert(str(x))
+            c = convert(str(now)) - convert(str(filetime))
             if float(c.total_seconds())>20:
 
                 r = requests.post(url = url_post,verify=False)
@@ -142,7 +141,10 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
     face_detected = False
     face_included_frames = 0  # freeze screen if face detected sequantially 5 frames
     freezed_frame = 0
-  #-----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
     cap = cv2.VideoCapture(0)  # webcam
     while (True):
         ret, img = cap.read()
@@ -198,13 +200,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
                     cv2.rectangle(Fin_img, (x, y), (x + w, y + h), (67, 67, 67),
                                   1)  # draw rectangle to main image
 
-                    # apply deep learning for custom_face
-                    #live_img = base_img.copy()
-                    #
                     custom_face = base_img[y:y + h, x:x + w]
-
-                    #liveornot = Liveness_Detection(live_img, x, y, h, w)
-                    # face recognition
 
                     custom_face = functions.preprocess_face(img=custom_face,
                                                             target_size=(input_shape_y, input_shape_x),
