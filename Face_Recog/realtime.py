@@ -297,3 +297,13 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
             face_included_frames = 0
             freeze = False
             freezed_frame = 0
+	    ret, buffer = cv2.imencode('.jpg', raw_img)
+            frame2 = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame2 + b'\r\n')
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):  # press q to quit
+            pass
+    # kill open cv things
+    cap.release()
+    cv2.destroyAllWindows()
