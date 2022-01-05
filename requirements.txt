@@ -14,3 +14,4 @@ mysql-connector-python
 retina-face
 seaborn
 matplotlib
+gitpython
