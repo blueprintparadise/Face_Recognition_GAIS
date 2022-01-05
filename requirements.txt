@@ -14,10 +14,3 @@ mysql-connector-python
 retina-face
 seaborn
 matplotlib
-albumentations
-pyOpenSSL
-argparse
-mediapipe
-pyopenssl
-dotmap
-imutils
