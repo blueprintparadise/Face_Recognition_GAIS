@@ -11,11 +11,7 @@ with open('Face_Recog/myfile.txt', 'w') as fp:
     x = datetime.datetime.now()
     print(str(x.strftime("%X")))
     fp.write(str(x.strftime("%X")))
-
-with open('Face_Recog/usertoken.txt', 'w') as fp:
-	fp.truncate(0)
 file1 = open(r"Face_Recog/myfile.txt","r+")
-file2 = open(r"Face_Recog/usertoken.txt","r+")
 import cv2
 import time
 import re
@@ -59,6 +55,7 @@ def get_token():
     tok = "".join(row)
     mycursor.close()
     mydb.commit()
+    print(tok)
     return  str(tok)
 
 def convert(date_time):
@@ -86,20 +83,10 @@ def get_name():
             for i in Names:
                 new = i.replace("images\\\\", "")
                 new_names.append(new)
-
             fin_names = new_names[-num_of_people:]
             uniqueNames = set(fin_names)
             upd_names = list(uniqueNames)
             the_token = get_token()
-
-            file2 = open(r"Face_Recog/usertoken.txt", "r+")
-            the_token = file2.read()
-
-            if len(the_token) < 3:
-                the_token = get_token()
-                print("Calling mysql")
-                file2.write(the_token)
-
             url_post = url.format(str(the_token),"Has Arrived",upd_names)
             file1 = open("Face_Recog/myfile.txt", "r+")
             filetime = file1.read()
@@ -297,7 +284,7 @@ def analysis(db_path, df, model_name='Facenet', detector_backend='mediapipe', di
             face_included_frames = 0
             freeze = False
             freezed_frame = 0
-	    ret, buffer = cv2.imencode('.jpg', raw_img)
+            ret, buffer = cv2.imencode('.jpg', raw_img)
             frame2 = buffer.tobytes()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame2 + b'\r\n')
