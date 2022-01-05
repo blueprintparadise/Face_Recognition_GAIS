@@ -1,5 +1,5 @@
 numpy
-pandas>=0.23.4
+pandas==0.23.1
 gdown>=3.10.1
 cmake
 tqdm>=4.30.0
