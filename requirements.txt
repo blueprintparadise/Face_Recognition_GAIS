@@ -4,8 +4,8 @@ gdown>=3.10.1
 cmake
 tqdm>=4.30.0
 Pillow>=5.2.0
-opencv-python>=4.2.0.34
-opencv-contrib-python>=4.3.0.36
+opencv-python
+opencv-contrib-python
 tensorflow>=1.9.0
 keras>=2.2.0
 Flask>=1.1.2
