@@ -19,7 +19,5 @@ pyOpenSSL
 argparse
 mediapipe
 pyopenssl
-opencv-python
-opencv-contrib-python
 dotmap
 imutils
