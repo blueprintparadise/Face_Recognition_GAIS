@@ -8,10 +8,9 @@ Pillow
 tensorflow
 keras
 Flask
-mtcnn
 lightgbm
 mysql-connector-python
-retina-face
+
 seaborn
 matplotlib
 gitpython
