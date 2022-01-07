@@ -42,7 +42,7 @@ app = Flask(__name__)
 # Using "Facenet" and "Mediapipe" recommended
 model_name = 'Facenet'
 
-db_path = r"Face_Recog/images"
+db_path = r"images"
 detector_backend = 'opencv'
 ''' Options-'opencv',
          'ssd' ,
