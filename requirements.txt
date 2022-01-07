@@ -20,6 +20,6 @@ pyOpenSSL
 argparse
 mediapipe
 pyopenssl
-
+mysql-connector-python
 dotmap
 imutils
