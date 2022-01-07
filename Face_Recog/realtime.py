@@ -7,7 +7,7 @@ import mysql.connector
 from tqdm import tqdm
 import numpy as np
 import math
-with open('Face_Recog/myfile.txt', 'w') as fp:
+with open('myfile.txt', 'w') as fp:
     x = datetime.datetime.now()
     print(str(x.strftime("%X")))
     fp.write(str(x.strftime("%X")))
