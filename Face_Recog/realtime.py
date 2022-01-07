@@ -11,7 +11,7 @@ with open('myfile.txt', 'w') as fp:
     x = datetime.datetime.now()
     print(str(x.strftime("%X")))
     fp.write(str(x.strftime("%X")))
-file1 = open(r"Face_Recog/myfile.txt","r+")
+file1 = open(r"myfile.txt","r+")
 import cv2
 import time
 import re
@@ -88,7 +88,7 @@ def get_name():
             upd_names = list(uniqueNames)
             the_token = get_token()
             url_post = url.format(str(the_token),"Has Arrived",upd_names)
-            file1 = open("Face_Recog/myfile.txt", "r+")
+            file1 = open("myfile.txt", "r+")
             filetime = file1.read()
             now = datetime.datetime.now().strftime("%X")
             c = convert(str(now)) - convert(str(filetime))
