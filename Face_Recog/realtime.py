@@ -33,7 +33,7 @@ from Face_Recog import  Liveness_Blinking
 Blink_time = 30
 name_list = []
 from urllib3.exceptions import InsecureRequestWarning
-mydb = mysql.connector.connect(host="43.231.127.150",port = "3306", user="usha-jagadambe", passwd="Gais@2020$usha-jagadambe", database="securitydb",
+mydb = mysql.connector.connect(host="43.231.124.114",port = "3306", user="parag", passwd="parag", database="securitydb",
                                            auth_plugin='mysql_native_password')
 
 # Suppress only the single warning from urllib3 needed.
